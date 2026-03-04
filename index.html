@@ -315,6 +315,83 @@
             </div>
         </div>
 
+        <!-- Günlük Görev Paneli -->
+        <div id="daily-panel" class="mb-8 slide-in">
+            <div class="glass-panel rounded-2xl p-6 border border-green-500/30">
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-xl">
+                            <i class="fa-solid fa-calendar-day text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Bugünün Görevi</h2>
+                            <p id="todayDate" class="text-sm text-slate-400"></p>
+                        </div>
+                    </div>
+                    <div id="todayProgress" class="text-right">
+                        <div class="text-3xl font-bold text-green-400 font-mono">Gün <span id="currentDayNum">1</span></div>
+                        <div class="text-xs text-slate-400">90 günlük program</div>
+                    </div>
+                </div>
+                
+                <div id="todayTask" class="p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                    <div class="text-slate-200 mb-2" id="todayTaskContent">Program yükleniyor...</div>
+                    <div class="text-xs text-slate-500" id="todayPhase"></div>
+                </div>
+                
+                <div class="mt-4 p-4 bg-yellow-900/20 border border-yellow-600/30 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-lightbulb text-yellow-400 text-xl"></i>
+                        <div>
+                            <p class="text-yellow-200 font-semibold">Günlük Rutin Hatırlatma</p>
+                            <p class="text-yellow-300/80 text-sm">20 paragraf + 15 problem çözmeyi unutma!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- İstatistik Dashboard -->
+        <div id="stats-dashboard" class="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4 slide-in">
+            <div class="glass-panel rounded-xl p-4 border border-blue-500/30">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-slate-400 text-xs">Toplam İlerleme</span>
+                    <i class="fa-solid fa-chart-line text-blue-400 text-sm"></i>
+                </div>
+                <div class="text-2xl font-bold text-white font-mono" id="statTotalProgress">0%</div>
+                <div class="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div id="statTotalBar" class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-4 border border-green-500/30">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-slate-400 text-xs">TYT Konuları</span>
+                    <i class="fa-solid fa-book text-green-400 text-sm"></i>
+                </div>
+                <div class="text-2xl font-bold text-white font-mono" id="statTYTProgress">0%</div>
+                <div class="text-xs text-slate-500 mt-1"><span id="statTYTCount">0/0</span> konu</div>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-4 border border-purple-500/30">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-slate-400 text-xs">AYT Konuları</span>
+                    <i class="fa-solid fa-brain text-purple-400 text-sm"></i>
+                </div>
+                <div class="text-2xl font-bold text-white font-mono" id="statAYTProgress">0%</div>
+                <div class="text-xs text-slate-500 mt-1"><span id="statAYTCount">0/0</span> konu</div>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-4 border border-orange-500/30">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-slate-400 text-xs">Tamamlanan Gün</span>
+                    <i class="fa-solid fa-fire text-orange-400 text-sm"></i>
+                </div>
+                <div class="text-2xl font-bold text-white font-mono" id="statCompletedDays">0</div>
+                <div class="text-xs text-slate-500 mt-1">/ 90 gün</div>
+            </div>
+        </div>
+
         <div id="weekly-container" class="space-y-4"></div>
 
         <!-- Konu Listesi Bölümü -->
@@ -821,6 +898,99 @@
                         { name: "Laiklik ve Din", importance: 0.55, questions: "0-1" },
                         { name: "Gençlik ve Sorunları (Dini Perspektif)", importance: 0.60, questions: "0-1" }
                     ]
+                },
+                aytMatematik: {
+                    title: "AYT MATEMATİK (40 Soru)",
+                    icon: "fa-square-root-variable",
+                    color: "violet",
+                    exam: "AYT",
+                    topics: [
+                        { name: "Fonksiyonlar (İleri)", importance: 0.95, questions: "2-3" },
+                        { name: "Polinomlar", importance: 0.83, questions: "1-2" },
+                        { name: "2. Dereceden Denklemler", importance: 0.90, questions: "1-2" },
+                        { name: "Parabol", importance: 0.82, questions: "1" },
+                        { name: "Karmaşık Sayılar", importance: 0.58, questions: "0-1" },
+                        { name: "Trigonometrik Fonksiyonlar", importance: 1.00, questions: "4-5" },
+                        { name: "Trigonometrik Denklemler", importance: 0.95, questions: "1-2" },
+                        { name: "Logaritma", importance: 0.90, questions: "2-3" },
+                        { name: "Diziler (Aritmetik, Geometrik)", importance: 0.90, questions: "1-2" },
+                        { name: "Limit", importance: 0.93, questions: "2-3" },
+                        { name: "Süreklilik", importance: 0.88, questions: "1" },
+                        { name: "Türev Tanımı ve Kuralları", importance: 0.98, questions: "2-3" },
+                        { name: "Türevin Uygulamaları", importance: 0.95, questions: "2-3" },
+                        { name: "Maksimum-Minimum", importance: 0.95, questions: "1-2" },
+                        { name: "Belirsiz İntegral", importance: 0.97, questions: "2-3" },
+                        { name: "Belirli İntegral", importance: 0.97, questions: "1-2" },
+                        { name: "İntegral ile Alan", importance: 0.85, questions: "1" },
+                        { name: "Olasılık (İleri)", importance: 0.92, questions: "1-2" }
+                    ]
+                },
+                aytGeometri: {
+                    title: "AYT GEOMETRİ (10-12 Soru)",
+                    icon: "fa-shapes",
+                    color: "fuchsia",
+                    exam: "AYT",
+                    topics: [
+                        { name: "Doğrunun Analitiği", importance: 0.92, questions: "1-3" },
+                        { name: "Çember ve Daire (İleri)", importance: 0.95, questions: "2-3" },
+                        { name: "Çemberin Analitiği", importance: 0.65, questions: "0-1" },
+                        { name: "Katı Cisimler (Prizma, Piramit)", importance: 0.82, questions: "1" },
+                        { name: "Katı Cisimler (Silindir, Koni, Küre)", importance: 0.82, questions: "1" },
+                        { name: "Dönüşüm Geometrisi", importance: 0.78, questions: "1" }
+                    ]
+                },
+                aytFizik: {
+                    title: "AYT FİZİK (14 Soru)",
+                    icon: "fa-magnet",
+                    color: "rose",
+                    exam: "AYT",
+                    topics: [
+                        { name: "Newton Yasaları (İleri)", importance: 0.97, questions: "2-3" },
+                        { name: "Düzgün Dairesel Hareket", importance: 0.92, questions: "1" },
+                        { name: "Enerji Korunumu (İleri)", importance: 0.95, questions: "1-2" },
+                        { name: "Momentum ve Çarpışmalar", importance: 0.82, questions: "1" },
+                        { name: "Atışlar (Yatay, Eğik)", importance: 0.82, questions: "1" },
+                        { name: "Elektrik Alan ve Potansiyel", importance: 0.93, questions: "1-2" },
+                        { name: "Manyetik Alan ve Kuvvet", importance: 0.92, questions: "1-2" },
+                        { name: "Elektromanyetik İndüksiyon", importance: 0.90, questions: "1" },
+                        { name: "Dalgalar ve Optik", importance: 0.82, questions: "1" },
+                        { name: "Modern Fizik", importance: 0.78, questions: "1" }
+                    ]
+                },
+                aytKimya: {
+                    title: "AYT KİMYA (13 Soru)",
+                    icon: "fa-vial",
+                    color: "amber",
+                    exam: "AYT",
+                    topics: [
+                        { name: "Modern Atom Teorisi", importance: 0.93, questions: "1-2" },
+                        { name: "Periyodik Sistem (İleri)", importance: 0.93, questions: "1" },
+                        { name: "Kimyasal Bağlar (İleri)", importance: 0.90, questions: "1-2" },
+                        { name: "Gazlar (İdeal Gaz Yasası)", importance: 0.85, questions: "1" },
+                        { name: "Çözeltiler (İleri)", importance: 0.90, questions: "1-2" },
+                        { name: "Kimyasal Denge", importance: 0.93, questions: "1-2" },
+                        { name: "Asit-Baz Dengesi (pH, pOH)", importance: 0.95, questions: "1-2" },
+                        { name: "Elektrokimya", importance: 0.82, questions: "1" },
+                        { name: "Organik Kimya (Hidrokarbonlar)", importance: 0.92, questions: "1-2" },
+                        { name: "Organik Kimya (Fonksiyonel Gruplar)", importance: 0.92, questions: "1" }
+                    ]
+                },
+                aytBiyoloji: {
+                    title: "AYT BİYOLOJİ (13 Soru)",
+                    icon: "fa-seedling",
+                    color: "lime",
+                    exam: "AYT",
+                    topics: [
+                        { name: "Hücre Biyolojisi (İleri)", importance: 0.95, questions: "1-2" },
+                        { name: "Fotosentez", importance: 0.95, questions: "1-2" },
+                        { name: "Hücresel Solunum", importance: 0.95, questions: "1-2" },
+                        { name: "DNA Replikasyonu", importance: 0.97, questions: "1" },
+                        { name: "Protein Sentezi", importance: 0.97, questions: "1-2" },
+                        { name: "Kalıtım (Mendel İleri)", importance: 0.93, questions: "1-2" },
+                        { name: "Sinir Sistemi (İleri)", importance: 0.92, questions: "1" },
+                        { name: "Dolaşım ve Bağışıklık Sistemi", importance: 0.80, questions: "1" },
+                        { name: "Evrim Teorisi", importance: 0.80, questions: "1" }
+                    ]
                 }
             }
         };
@@ -917,6 +1087,117 @@
             const progress = loadProgress();
             progress[id] = !progress[id];
             saveProgress(progress);
+        }
+
+        function updateTotalProgress() {
+            let totalWeight = 0;
+            let completedWeight = 0;
+            
+            Object.entries(WEIGHTS).forEach(([id, weight]) => {
+                const cb = document.getElementById(id);
+                if (!cb) return;
+                totalWeight += weight;
+                if (cb.checked) {
+                    completedWeight += weight;
+                }
+            });
+            
+            const percentage = totalWeight > 0 
+                ? Math.round((completedWeight / totalWeight) * 100) 
+                : 0;
+            
+            document.getElementById('progressText').textContent = percentage + '%';
+            document.getElementById('totalProgress').style.width = percentage + '%';
+            
+            // İstatistik panelini güncelle
+            updateStatsPanel(percentage);
+        }
+
+        // Günlük Panel Güncelleme
+        function updateDailyPanel() {
+            const startDate = new Date('2026-03-05'); // Program başlangıç tarihi
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = today - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            const currentDay = Math.max(1, Math.min(diffDays, 90));
+            
+            // Tarih güncelle
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('todayDate').textContent = today.toLocaleDateString('tr-TR', options);
+            document.getElementById('currentDayNum').textContent = currentDay;
+            
+            // Bugünün görevini bul
+            let todayTask = null;
+            let todayWeek = null;
+            
+            for (const week of studyPlan.weeks) {
+                for (const day of week.days) {
+                    const dayMatch = day.day.match(/(\d+)/);
+                    if (dayMatch && parseInt(dayMatch[1]) === currentDay) {
+                        todayTask = day;
+                        todayWeek = week;
+                        break;
+                    }
+                }
+                if (todayTask) break;
+            }
+            
+            if (todayTask && todayWeek) {
+                document.getElementById('todayTaskContent').textContent = todayTask.task;
+                document.getElementById('todayPhase').textContent = `${todayWeek.phase} • ${todayWeek.title}`;
+            } else {
+                document.getElementById('todayTaskContent').textContent = 
+                    currentDay > 90 ? '🎉 Program tamamlandı! Başarılar!' : '📚 Program henüz başlamadı.';
+                document.getElementById('todayPhase').textContent = '';
+            }
+        }
+
+        // İstatistik Paneli Güncelleme
+        function updateStatsPanel(totalPercentage) {
+            // Toplam ilerleme
+            document.getElementById('statTotalProgress').textContent = totalPercentage + '%';
+            document.getElementById('statTotalBar').style.width = totalPercentage + '%';
+            
+            // TYT konuları
+            const tytSubjects = ['turkce', 'matematik', 'fizik', 'kimya', 'biyoloji', 'tarih', 'cografya', 'felsefe', 'din'];
+            const tytStats = calculateSubjectGroupProgress(tytSubjects);
+            document.getElementById('statTYTProgress').textContent = tytStats.percentage + '%';
+            document.getElementById('statTYTCount').textContent = `${tytStats.completed}/${tytStats.total}`;
+            
+            // AYT konuları
+            const aytSubjects = ['aytMatematik', 'aytGeometri', 'aytFizik', 'aytKimya', 'aytBiyoloji'];
+            const aytStats = calculateSubjectGroupProgress(aytSubjects);
+            document.getElementById('statAYTProgress').textContent = aytStats.percentage + '%';
+            document.getElementById('statAYTCount').textContent = `${aytStats.completed}/${aytStats.total}`;
+            
+            // Tamamlanan günler
+            let completedDays = 0;
+            for (let i = 1; i <= 90; i++) {
+                if (progressCache[`d${i}`]) completedDays++;
+            }
+            document.getElementById('statCompletedDays').textContent = completedDays;
+        }
+
+        function calculateSubjectGroupProgress(subjectKeys) {
+            let completed = 0;
+            let total = 0;
+            
+            subjectKeys.forEach(key => {
+                const subject = studyPlan.subjects[key];
+                if (subject) {
+                    subject.topics.forEach((topic, index) => {
+                        const topicId = `${key}_${index}`;
+                        total++;
+                        if (progressCache[topicId]) completed++;
+                    });
+                }
+            });
+            
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            return { completed, total, percentage };
         }
 
         function updateTotalProgress() {
@@ -1142,6 +1423,7 @@
             setupFirebase();
             renderWeeks();
             renderSubjects();
+            updateDailyPanel();
             updateTotalProgress();
             startCountdown();
         });
