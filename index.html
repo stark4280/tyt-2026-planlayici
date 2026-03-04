@@ -1342,6 +1342,11 @@
                 weekDiv.appendChild(content);
                 container.appendChild(weekDiv);
             });
+            
+            // Render tamamlandıktan sonra istatistikleri güncelle
+            setTimeout(() => {
+                updateTotalProgress();
+            }, 100);
         }
 
         // Konu Listesini Render Et
@@ -1423,15 +1428,19 @@
                 subjectDiv.appendChild(topicList);
                 container.appendChild(subjectDiv);
             });
+            
+            // Render tamamlandıktan sonra istatistikleri güncelle
+            setTimeout(() => {
+                updateTotalProgress();
+            }, 100);
         }
 
         // Sayfa Yüklendiğinde
         document.addEventListener('DOMContentLoaded', () => {
             setupFirebase();
+            updateDailyPanel();
             renderWeeks();
             renderSubjects();
-            updateDailyPanel();
-            updateTotalProgress();
             startCountdown();
         });
 
