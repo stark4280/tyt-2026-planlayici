@@ -1184,11 +1184,10 @@
             document.getElementById('statAYTProgress').textContent = aytStats.percentage + '%';
             document.getElementById('statAYTCount').textContent = `${aytStats.completed}/${aytStats.total}`;
             
-            // Tamamlanan günler - checkbox'ları kontrol et
+            // Tamamlanan günler - progressCache'den kontrol et
             let completedDays = 0;
             for (let i = 1; i <= 90; i++) {
-                const checkbox = document.getElementById(`d${i}`);
-                if (checkbox && checkbox.checked) {
+                if (progressCache[`d${i}`]) {
                     completedDays++;
                 }
             }
@@ -1206,9 +1205,8 @@
                     subject.topics.forEach((topic, index) => {
                         const topicId = `${key}_${index}`;
                         total++;
-                        // Checkbox'ı kontrol et
-                        const checkbox = document.getElementById(topicId);
-                        if (checkbox && checkbox.checked) {
+                        // progressCache'den kontrol et
+                        if (progressCache[topicId]) {
                             completed++;
                         }
                     });
