@@ -374,12 +374,18 @@
 
         // LocalStorage Key
         const STORAGE_KEY = 'tyt_2026_progress';
+        
+        // Global progress cache
+        let progressCache = {};
+        
+        // Global weights for importance-based progress
+        const WEIGHTS = {};
 
         // Veri Yapısı
         const studyPlan = {
             examInfo: {
                 tyt: {
-                    date: "20 Haziran 2026 Cuma",
+                    date: "20 Haziran 2026 Cumartesi",
                     duration: 135,
                     totalQuestions: 120,
                     subjects: {
@@ -390,7 +396,7 @@
                     }
                 },
                 ayt: {
-                    date: "21 Haziran 2026 Cumartesi",
+                    date: "21 Haziran 2026 Pazar",
                     duration: 180,
                     totalQuestions: 160
                 }
@@ -464,42 +470,122 @@
                     ]
                 },
                 {
-                    title: "6-9. HAFTA: AYT Geçiş Dönemi",
+                    title: "6. HAFTA: AYT Geçiş - Polinomlar ve Denklemler",
                     phase: "🟣 AYT Geçiş",
-                    date: "Gün 36-63",
+                    date: "Gün 36-42",
                     importance: 0.93,
                     days: [
-                        { day: "36-42. Gün", task: "AYT Mat: Polinomlar, 2.Derece Denklemler, Karmaşık Sayılar, Analitik Geo | AYT Fizik: Modern Atom | AYT Kimya: Gazlar | TYT: Günlük 15 Problem + 15 Paragraf", check: "d36" },
-                        { day: "43-49. Gün", task: "🔥 AYT Mat: Trigonometri-1, Trigonometri-2, Logaritma, Diziler | AYT Fizik: Newton Yasaları | AYT Kimya: Sıvı Çözeltiler | TYT: Haftada 2 Genel Deneme", check: "d43" },
-                        { day: "50-56. Gün", task: "AYT Mat: Fonksiyon Uygulamaları, Eşitsizlikler | AYT Geo: Katı Cisimler | AYT Fizik: Atışlar | AYT Kimya: Kimyasal Denge | TYT: Sosyal Check-up", check: "d50" },
-                        { day: "57-63. Gün", task: "AYT Fizik: Enerji, Momentum | AYT Kimya: Elektrokimya | AYT Biyoloji: Dolaşım, Bağışıklık | TYT: Fen Check-up + Son TYT Denemesi", check: "d57" }
+                        { day: "36. Gün", task: "AYT Mat: Polinomlar Giriş | AYT Fizik: Modern Atom Modelleri | TYT: 15 Problem + 15 Paragraf", check: "d36" },
+                        { day: "37. Gün", task: "AYT Mat: Polinomlar Soru Çözümü | AYT Kimya: Gazlar Giriş | TYT: 15 Problem + 15 Paragraf", check: "d37" },
+                        { day: "38. Gün", task: "AYT Mat: 2.Derece Denklemler | AYT Fizik: Atom Spektrumları | TYT: 15 Problem + 15 Paragraf", check: "d38" },
+                        { day: "39. Gün", task: "AYT Mat: Karmaşık Sayılar Giriş | AYT Kimya: Gaz Denklemleri | TYT: 15 Problem + 15 Paragraf", check: "d39" },
+                        { day: "40. Gün", task: "AYT Mat: Karmaşık Sayılar İşlemler | AYT Fizik: Bohr Atom Modeli | TYT: 15 Problem + 15 Paragraf", check: "d40" },
+                        { day: "41. Gün", task: "AYT Mat: Analitik Geometri Giriş | AYT Kimya: Gazlar Soru Çözümü | TYT: 15 Problem + 15 Paragraf", check: "d41" },
+                        { day: "42. Gün", task: "🎯 DENEME: AYT Mat Branş + TYT Genel Deneme", check: "d42" }
                     ]
                 },
                 {
-                    title: "10-11. HAFTA: LİMİT-TÜREV (Zirve)",
+                    title: "7. HAFTA: AYT Geçiş - Trigonometri ve Logaritma",
+                    phase: "🟣 AYT Geçiş",
+                    date: "Gün 43-49",
+                    importance: 0.93,
+                    days: [
+                        { day: "43. Gün", task: "🔥 AYT Mat: Trigonometri-1 Temel Kavramlar | AYT Fizik: Newton 1. Yasa | TYT: 15 Problem + 15 Paragraf", check: "d43" },
+                        { day: "44. Gün", task: "🔥 AYT Mat: Trigonometri-1 Soru Çözümü | AYT Kimya: Sıvı Çözeltiler Giriş | TYT: 15 Problem + 15 Paragraf", check: "d44" },
+                        { day: "45. Gün", task: "🔥 AYT Mat: Trigonometri-2 İleri Konular | AYT Fizik: Newton 2-3. Yasalar | TYT: 15 Problem + 15 Paragraf", check: "d45" },
+                        { day: "46. Gün", task: "🔥 AYT Mat: Logaritma Tanım ve Özellikler | AYT Kimya: Derişim Birimleri | TYT: 15 Problem + 15 Paragraf", check: "d46" },
+                        { day: "47. Gün", task: "🔥 AYT Mat: Logaritma Soru Çözümü | AYT Fizik: Sürtünme Kuvveti | TYT: 15 Problem + 15 Paragraf", check: "d47" },
+                        { day: "48. Gün", task: "🔥 AYT Mat: Diziler | AYT Kimya: Çözünürlük | TYT: 15 Problem + 15 Paragraf", check: "d48" },
+                        { day: "49. Gün", task: "🎯 DENEME: TYT + AYT Genel Deneme", check: "d49" }
+                    ]
+                },
+                {
+                    title: "8. HAFTA: AYT Geçiş - Fonksiyonlar ve Geometri",
+                    phase: "🟣 AYT Geçiş",
+                    date: "Gün 50-56",
+                    importance: 0.93,
+                    days: [
+                        { day: "50. Gün", task: "AYT Mat: Fonksiyon Uygulamaları | AYT Geo: Katı Cisimler Giriş | TYT: 15 Problem + 15 Paragraf", check: "d50" },
+                        { day: "51. Gün", task: "AYT Mat: Fonksiyon Soru Çözümü | AYT Fizik: Atışlar Yatay | TYT: 15 Problem + 15 Paragraf", check: "d51" },
+                        { day: "52. Gün", task: "AYT Mat: Eşitsizlikler | AYT Kimya: Kimyasal Denge Giriş | TYT: 15 Problem + 15 Paragraf", check: "d52" },
+                        { day: "53. Gün", task: "AYT Geo: Katı Cisimler Hacim | AYT Fizik: Atışlar Eğik | TYT: 15 Problem + 15 Paragraf", check: "d53" },
+                        { day: "54. Gün", task: "AYT Mat: Eşitsizlik Soru Çözümü | AYT Kimya: Denge Sabiti | TYT: Sosyal Check-up", check: "d54" },
+                        { day: "55. Gün", task: "AYT Geo: Katı Cisimler Soru Çözümü | AYT Fizik: Atışlar Karma | TYT: Sosyal Check-up", check: "d55" },
+                        { day: "56. Gün", task: "🎯 DENEME: AYT Genel + TYT Sosyal Branş", check: "d56" }
+                    ]
+                },
+                {
+                    title: "9. HAFTA: AYT Geçiş - Enerji ve Biyoloji",
+                    phase: "🟣 AYT Geçiş",
+                    date: "Gün 57-63",
+                    importance: 0.93,
+                    days: [
+                        { day: "57. Gün", task: "AYT Fizik: Enerji Türleri | AYT Kimya: Elektrokimya Giriş | TYT: 15 Problem + 15 Paragraf", check: "d57" },
+                        { day: "58. Gün", task: "AYT Fizik: İş-Güç-Enerji | AYT Biyoloji: Dolaşım Sistemi | TYT: 15 Problem + 15 Paragraf", check: "d58" },
+                        { day: "59. Gün", task: "AYT Fizik: Momentum | AYT Kimya: Elektroliz | TYT: 15 Problem + 15 Paragraf", check: "d59" },
+                        { day: "60. Gün", task: "AYT Fizik: Çarpışmalar | AYT Biyoloji: Bağışıklık Sistemi | TYT: Fen Check-up", check: "d60" },
+                        { day: "61. Gün", task: "AYT Kimya: Piller | AYT Biyoloji: Dolaşım Soru Çözümü | TYT: Fen Check-up", check: "d61" },
+                        { day: "62. Gün", task: "AYT Fizik: Enerji-Momentum Karma | AYT Biyoloji: Bağışıklık Soru Çözümü | TYT: Fen Check-up", check: "d62" },
+                        { day: "63. Gün", task: "🎯 SON TYT DENEMESİ + AYT Genel Deneme", check: "d63" }
+                    ]
+                },
+                {
+                    title: "10. HAFTA: LİMİT (Zirve Başlangıcı)",
                     phase: "🔴 AYT Zirve",
-                    date: "Gün 64-77",
+                    date: "Gün 64-70",
                     importance: 1.00,
                     days: [
-                        { day: "64-66. Gün", task: "🔥🔥 AYT Mat: Limit Kavramı, Limit Hesaplama, Süreklilik (Her gün 4 saat) | AYT Fizik: Elektrik Alan | AYT Kimya: Organik-1", check: "d64" },
+                        { day: "64. Gün", task: "🔥🔥 AYT Mat: Limit Kavramı (4 saat) | AYT Fizik: Elektrik Alan Giriş | AYT Kimya: Organik-1 Giriş", check: "d64" },
+                        { day: "65. Gün", task: "🔥🔥 AYT Mat: Limit Hesaplama Yöntemleri (4 saat) | AYT Fizik: Elektrik Potansiyel | AYT Kimya: Hidrokarbonlar", check: "d65" },
+                        { day: "66. Gün", task: "🔥🔥 AYT Mat: Süreklilik (4 saat) | AYT Fizik: Elektrik Alan Soru Çözümü | AYT Kimya: Organik Bileşikler", check: "d66" },
                         { day: "67. Gün", task: "🎯 AYT DENEME: Matematik Branş Denemesi", check: "d67" },
-                        { day: "68-71. Gün", task: "🔥🔥 AYT Mat: Türev Tanımı, Türev Kuralları, Türev Uygulamaları, Maks-Min (Her gün 4 saat) | AYT Fizik: Manyetizma | AYT Kimya: Organik-2", check: "d68" },
-                        { day: "72. Gün", task: "🎯 AYT DENEME: Genel AYT Denemesi", check: "d72" },
-                        { day: "73-77. Gün", task: "🔥 AYT Mat: Türev İleri, Olasılık İleri | AYT Geo: Çemberin Analitiği | AYT Fizik: Elektromanyetik İndüksiyon | AYT Biyoloji: DNA-Protein Sentezi | AYT: Gün aşırı Deneme", check: "d73" }
+                        { day: "68. Gün", task: "🔥🔥 AYT Mat: Türev Tanımı (4 saat) | AYT Fizik: Manyetizma Giriş | AYT Kimya: Organik-2 Giriş", check: "d68" },
+                        { day: "69. Gün", task: "🔥🔥 AYT Mat: Türev Kuralları (4 saat) | AYT Fizik: Manyetik Alan | AYT Kimya: Fonksiyonel Gruplar", check: "d69" },
+                        { day: "70. Gün", task: "🔥🔥 AYT Mat: Türev Uygulamaları (4 saat) | AYT Fizik: Manyetizma Soru Çözümü | AYT Kimya: Organik Reaksiyonlar", check: "d70" }
                     ]
                 },
                 {
-                    title: "12-13. HAFTA: İNTEGRAL ve Final",
+                    title: "11. HAFTA: TÜREV (Zirve Devam)",
+                    phase: "🔴 AYT Zirve",
+                    date: "Gün 71-77",
+                    importance: 1.00,
+                    days: [
+                        { day: "71. Gün", task: "🔥🔥 AYT Mat: Türev ile Maks-Min (4 saat) | AYT Fizik: Elektromanyetik İndüksiyon | AYT Biyoloji: DNA Yapısı", check: "d71" },
+                        { day: "72. Gün", task: "🎯 AYT DENEME: Genel AYT Denemesi", check: "d72" },
+                        { day: "73. Gün", task: "🔥 AYT Mat: Türev İleri Konular | AYT Geo: Çemberin Analitiği | AYT Biyoloji: Protein Sentezi | AYT Deneme", check: "d73" },
+                        { day: "74. Gün", task: "🔥 AYT Mat: Olasılık İleri | AYT Fizik: İndüksiyon Soru Çözümü | AYT Biyoloji: Gen İfadesi", check: "d74" },
+                        { day: "75. Gün", task: "🔥 AYT Geo: Çember Soru Çözümü | AYT Fizik: Alternatif Akım | AYT Biyoloji: DNA Replikasyonu | AYT Deneme", check: "d75" },
+                        { day: "76. Gün", task: "🔥 AYT Mat: Türev-Limit Karma | AYT Fizik: Transformatör | AYT Kimya: Organik Karma", check: "d76" },
+                        { day: "77. Gün", task: "🎯 AYT DENEME: Matematik + Fen Branş Denemesi", check: "d77" }
+                    ]
+                },
+                {
+                    title: "12. HAFTA: İNTEGRAL (Zirve Final)",
                     phase: "🔴 AYT Zirve + Final",
-                    date: "Gün 78-90",
+                    date: "Gün 78-84",
                     importance: 0.95,
                     days: [
-                        { day: "78-80. Gün", task: "🔥🔥 AYT Mat: Belirsiz İntegral, Belirli İntegral, İntegral ile Alan (Her gün 4 saat) | AYT Fizik: Modern Fizik | AYT Kimya: Asit-Baz Dengesi", check: "d78" },
-                        { day: "81. Gün", task: "🎯 PROVA: Sabah TYT - Öğle AYT Tam Sınav Simülasyonu", check: "d81" },
-                        { day: "82-84. Gün", task: "AYT Mat: İntegral ile Hacim | AYT: Organik Kimya Hızlı Tur | AYT Fizik: Dalgalar-Optik | GENEL DENEME", check: "d82" },
-                        { day: "85-88. Gün", task: "Eksik Konular: Mantık, Karmaşık Sayılar | Düşük Önem: Radyoaktivite, Biyoteknoloji | MEB Çıkmış Sorular (Son 3 Yıl)", check: "d85" },
-                        { day: "89. Gün", task: "🎯 SON PROVA: Sabah TYT - Öğle AYT Tam Sınav", check: "d89" },
-                        { day: "90. Gün", task: "💆 DİNLENME: Hafif Tekrar, Motivasyon, Strateji Gözden Geçirme", check: "d90" }
+                        { day: "78. Gün", task: "🔥🔥 AYT Mat: Belirsiz İntegral (4 saat) | AYT Fizik: Modern Fizik Giriş | AYT Kimya: Asit-Baz Dengesi", check: "d78" },
+                        { day: "79. Gün", task: "🔥🔥 AYT Mat: Belirli İntegral (4 saat) | AYT Fizik: Kuantum Fiziği | AYT Kimya: pH Hesaplamaları", check: "d79" },
+                        { day: "80. Gün", task: "🔥🔥 AYT Mat: İntegral ile Alan (4 saat) | AYT Fizik: Fotoelektrik Olay | AYT Kimya: Tampon Çözeltiler", check: "d80" },
+                        { day: "81. Gün", task: "🎯 PROVA: Sabah TYT (10:15) - Öğle AYT (10:15) Tam Sınav Simülasyonu", check: "d81" },
+                        { day: "82. Gün", task: "AYT Mat: İntegral ile Hacim | AYT Fizik: Dalgalar | AYT Kimya: Organik Kimya Hızlı Tur", check: "d82" },
+                        { day: "83. Gün", task: "AYT Mat: İntegral Soru Çözümü | AYT Fizik: Optik | AYT: Organik Reaksiyonlar Tekrar", check: "d83" },
+                        { day: "84. Gün", task: "🎯 GENEL DENEME: TYT + AYT Tam Deneme", check: "d84" }
+                    ]
+                },
+                {
+                    title: "13. HAFTA: Final ve Dinlenme",
+                    phase: "🔴 AYT Zirve + Final",
+                    date: "Gün 85-90",
+                    importance: 0.95,
+                    days: [
+                        { day: "85. Gün", task: "Eksik Konular: Mantık, Karmaşık Sayılar | MEB Çıkmış Sorular (2024)", check: "d85" },
+                        { day: "86. Gün", task: "Eksik Konular: Kombinatorik, Olasılık | MEB Çıkmış Sorular (2023)", check: "d86" },
+                        { day: "87. Gün", task: "Düşük Önem: Radyoaktivite, Biyoteknoloji | MEB Çıkmış Sorular (2022)", check: "d87" },
+                        { day: "88. Gün", task: "Zayıf Konular Tekrar | Hızlı Formül Taraması", check: "d88" },
+                        { day: "89. Gün", task: "🎯 SON PROVA: Sabah TYT (10:15) - Öğle AYT (10:15) Tam Sınav", check: "d89" },
+                        { day: "90. Gün", task: "💆 DİNLENME: Hafif Tekrar, Motivasyon, Strateji Gözden Geçirme, Erken Yat", check: "d90" }
                     ]
                 }
             ],
@@ -742,18 +828,18 @@
         // LocalStorage İşlemleri
         function loadProgress() {
             if (useCloud) {
-                // Buluttan yükle
-                return {}; // Firebase listener'dan gelecek
+                return progressCache;
             } else {
-                // Yerel depodan yükle
                 const saved = localStorage.getItem(STORAGE_KEY);
-                return saved ? JSON.parse(saved) : {};
+                progressCache = saved ? JSON.parse(saved) : {};
+                return progressCache;
             }
         }
 
         function saveProgress(data) {
+            progressCache = data;
+            
             if (useCloud) {
-                // Buluta kaydet
                 updateSyncStatus('syncing');
                 database.ref('users/' + USER_ID + '/progress').set(data)
                     .then(() => {
@@ -762,11 +848,9 @@
                     .catch((error) => {
                         console.error('Buluta kayıt hatası:', error);
                         updateSyncStatus('error');
-                        // Hata olursa yerel depoya kaydet
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
                     });
             } else {
-                // Yerel depoya kaydet
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             }
             updateTotalProgress();
@@ -774,6 +858,11 @@
 
         function updateSyncStatus(status) {
             const syncStatus = document.getElementById('syncStatus');
+            if (!syncStatus) return;
+            
+            // Her durumda görünür olsun
+            syncStatus.classList.remove('hidden');
+            
             const icon = syncStatus.querySelector('i');
             const text = syncStatus.querySelector('span');
             
@@ -803,24 +892,25 @@
                 return;
             }
 
-            // Buluttan veriyi yükle ve dinle
-            database.ref('users/' + USER_ID + '/progress').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    // Buluttan gelen veriyi uygula
-                    Object.keys(data).forEach(key => {
+            database.ref('users/' + USER_ID + '/progress').on(
+                'value',
+                (snapshot) => {
+                    const data = snapshot.val() || {};
+                    progressCache = data;
+                    
+                    Object.entries(data).forEach(([key, value]) => {
                         const checkbox = document.getElementById(key);
-                        if (checkbox) {
-                            checkbox.checked = data[key];
-                        }
+                        if (checkbox) checkbox.checked = !!value;
                     });
+                    
                     updateTotalProgress();
                     updateSyncStatus('synced');
+                },
+                (error) => {
+                    console.error('Firebase okuma hatası:', error);
+                    updateSyncStatus('error');
                 }
-            }, (error) => {
-                console.error('Firebase okuma hatası:', error);
-                updateSyncStatus('error');
-            });
+            );
         }
 
         function toggleCheck(id) {
@@ -830,11 +920,21 @@
         }
 
         function updateTotalProgress() {
-            const progress = loadProgress();
-            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-            const totalTasks = allCheckboxes.length;
-            const completedTasks = Array.from(allCheckboxes).filter(cb => cb.checked).length;
-            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            let totalWeight = 0;
+            let completedWeight = 0;
+            
+            Object.entries(WEIGHTS).forEach(([id, weight]) => {
+                const cb = document.getElementById(id);
+                if (!cb) return;
+                totalWeight += weight;
+                if (cb.checked) {
+                    completedWeight += weight;
+                }
+            });
+            
+            const percentage = totalWeight > 0 
+                ? Math.round((completedWeight / totalWeight) * 100) 
+                : 0;
             
             document.getElementById('progressText').textContent = percentage + '%';
             document.getElementById('totalProgress').style.width = percentage + '%';
@@ -908,6 +1008,10 @@
 
                 week.days.forEach(day => {
                     const isChecked = progress[day.check] || false;
+                    
+                    // Populate WEIGHTS for importance-based progress
+                    WEIGHTS[day.check] = week.importance;
+                    
                     const dayDiv = document.createElement('div');
                     dayDiv.className = 'day-card flex items-start gap-4 p-5 rounded-xl border border-slate-700/50';
                     
@@ -975,6 +1079,9 @@
                 subject.topics.forEach((topic, index) => {
                     const topicId = `${key}_${index}`;
                     const isChecked = progress[topicId] || false;
+                    
+                    // Populate WEIGHTS for importance-based progress
+                    WEIGHTS[topicId] = topic.importance;
                     
                     // Önem derecesine göre renk
                     let importanceColor = 'slate';
