@@ -1221,27 +1221,6 @@
             return { completed, total, percentage };
         }
 
-        function updateTotalProgress() {
-            let totalWeight = 0;
-            let completedWeight = 0;
-            
-            Object.entries(WEIGHTS).forEach(([id, weight]) => {
-                const cb = document.getElementById(id);
-                if (!cb) return;
-                totalWeight += weight;
-                if (cb.checked) {
-                    completedWeight += weight;
-                }
-            });
-            
-            const percentage = totalWeight > 0 
-                ? Math.round((completedWeight / totalWeight) * 100) 
-                : 0;
-            
-            document.getElementById('progressText').textContent = percentage + '%';
-            document.getElementById('totalProgress').style.width = percentage + '%';
-        }
-
         // Haftalık Planı Render Et
         function renderWeeks() {
             const container = document.getElementById('weekly-container');
