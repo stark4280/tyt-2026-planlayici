@@ -228,7 +228,8 @@
                             </div>
                             <div>
                                 <h3 class="text-white font-bold text-lg">TYT 2026</h3>
-                                <p class="text-xs text-purple-300">20 Haziran 2026 • 135 dk • 120 soru</p>
+                                <p class="text-xs text-purple-300">20 Haziran 2026 Cumartesi • 10:15</p>
+                                <p class="text-xs text-purple-400">135 dk • 120 soru</p>
                             </div>
                         </div>
                         <div class="flex gap-2 text-xs flex-wrap">
@@ -247,7 +248,8 @@
                             </div>
                             <div>
                                 <h3 class="text-white font-bold text-lg">AYT 2026</h3>
-                                <p class="text-xs text-blue-300">21 Haziran 2026 • 180 dk • 160 soru</p>
+                                <p class="text-xs text-blue-300">21 Haziran 2026 Pazar • 10:15</p>
+                                <p class="text-xs text-blue-400">180 dk • 160 soru</p>
                             </div>
                         </div>
                         <div class="flex gap-2 text-xs flex-wrap">
@@ -259,11 +261,13 @@
                     </div>
 
                     <!-- Geri Sayım -->
-                    <div class="flex-1 min-w-[200px] text-center">
-                        <div class="bg-gradient-to-br from-red-900/30 to-orange-900/30 border border-red-600/30 rounded-xl p-4">
-                            <p class="text-xs text-red-300 mb-1 uppercase font-bold">Sınava Kalan</p>
-                            <p class="text-3xl font-bold text-white font-mono" id="countdown">--</p>
-                            <p class="text-xs text-red-300 mt-1">gün</p>
+                    <div class="flex-1 min-w-[200px]">
+                        <div class="bg-gradient-to-br from-red-900/30 to-orange-900/30 border border-red-600/30 rounded-xl p-4 text-center">
+                            <p class="text-xs text-red-300 mb-2 uppercase font-bold">TYT'ye Kalan</p>
+                            <div class="text-4xl font-bold text-white font-mono">
+                                <span id="countdownDays">107</span>
+                            </div>
+                            <p class="text-sm text-red-300 mt-1">gün</p>
                         </div>
                     </div>
                 </div>
@@ -303,7 +307,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-4 pt-4 border-t border-purple-500/30">
+            <div class="mt-4 pt-4 border-t border-purple-500/30"></div>
                 <p class="text-xs text-yellow-200 flex items-center gap-2">
                     <i class="fa-solid fa-lightbulb text-yellow-400"></i>
                     <span><strong>Altın Kural:</strong> Her gün 20 paragraf + 15 problem çöz!</span>
@@ -1035,27 +1039,26 @@
             startCountdown();
         });
 
-        // Geri Sayım
+        // Geri Sayım - Sadece Gün
         function startCountdown() {
-            const examDate = new Date('2026-06-20T09:00:00');
+            const examDate = new Date('2026-06-20');
             
             function updateCountdown() {
                 const now = new Date();
-                const diff = examDate - now;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                now.setHours(0, 0, 0, 0); // Günün başına ayarla
+                examDate.setHours(0, 0, 0, 0);
                 
-                const countdownEl = document.getElementById('countdown');
-                if (countdownEl) {
-                    if (days > 0) {
-                        countdownEl.textContent = days;
-                    } else {
-                        countdownEl.textContent = '0';
-                    }
+                const diff = examDate - now;
+                const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                
+                const daysEl = document.getElementById('countdownDays');
+                if (daysEl) {
+                    daysEl.textContent = days > 0 ? days : 0;
                 }
             }
             
             updateCountdown();
-            setInterval(updateCountdown, 1000 * 60 * 60); // Her saat güncelle
+            setInterval(updateCountdown, 3600000); // Her saat güncelle
         }
     </script>
 
