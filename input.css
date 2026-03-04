@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+.font-mono { 
+    font-family: 'JetBrains Mono', monospace; 
+}
+
+::-webkit-scrollbar { 
+    width: 8px; 
+}
+
+::-webkit-scrollbar-track { 
+    background: #1e293b; 
+}
+
+::-webkit-scrollbar-thumb { 
+    background: #3b82f6; 
+    border-radius: 4px; 
+}
+
+::-webkit-scrollbar-thumb:hover { 
+    background: #2563eb; 
+}
+
+.checkbox-wrapper input:checked + div {
+    background-color: #10B981;
+    border-color: #10B981;
+    color: white;
+}
+
+.topic-item input:checked + span {
+    text-decoration: line-through;
+    color: #64748b;
+}
+
+details > summary { 
+    list-style: none; 
+}
+
+details > summary::-webkit-details-marker { 
+    display: none; 
+}
+
+.glass-panel {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeIn { 
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    } 
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    } 
+}
+
+.fade-in { 
+    animation: fadeIn 0.3s ease-in-out; 
+}

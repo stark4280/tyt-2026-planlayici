@@ -1,0 +1,19 @@
+{
+  "name": "study-dashboard-main",
+  "version": "1.0.0",
+  "description": "study-dashboard",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "node node_modules/tailwindcss/lib/cli.js -i ./input.css -o ./output.css --minify",
+    "watch:css": "node node_modules/tailwindcss/lib/cli.js -i ./input.css -o ./output.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "tailwindcss": "^4.2.1"
+  }
+}

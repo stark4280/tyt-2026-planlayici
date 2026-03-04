@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYT Hazırlık Planlayıcı 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background-attachment: fixed;
+        }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #2563eb, #7c3aed); }
+
+        .checkbox-wrapper input:checked + div {
+            background-color: #10B981;
+            border-color: #10B981;
+            color: white;
+        }
+
+        .topic-item input:checked + span {
+            text-decoration: line-through;
+            color: #64748b;
+        }
+        
+        details > summary { 
+            list-style: none;
+            position: relative;
+        }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        details[open] > summary .chevron {
+            transform: rotate(180deg);
+        }
+        
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-gradient {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .week-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .week-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .day-card {
+            background: linear-gradient(135deg, rgba(51, 65, 85, 0.5) 0%, rgba(30, 41, 59, 0.5) 100%);
+            transition: all 0.2s ease;
+        }
+
+        .day-card:hover {
+            background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+            transform: translateX(4px);
+        }
+
+        .subject-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .slide-in { animation: slideIn 0.4s ease-out; }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .badge {
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .youtube-btn {
+            transition: all 0.2s ease;
+        }
+
+        .youtube-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        .phase-badge {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        input[type="checkbox"]:checked {
+            transform: scale(1.1);
+        }
+
+        .exam-card {
+            background: linear-gradient(135deg, rgba(126, 34, 206, 0.2) 0%, rgba(88, 28, 135, 0.2) 100%);
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exam-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+            border-left: 4px solid;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen selection:bg-blue-500 selection:text-white">
+
+    <!-- Header -->
+    <nav class="sticky top-0 z-50 glass-panel shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-4">
+                    <div class="bg-gradient-to-br from-blue-500 to-purple-600 p-3 rounded-xl shadow-lg">
+                        <i class="fa-solid fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-2xl tracking-tight text-white glow-text leading-none">TYT HAZIRLIK 2026</h1>
+                        <span class="text-xs text-blue-400 font-mono">v2.0_90gun_stratejik</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <!-- Senkronizasyon Durumu -->
+                    <div id="syncStatus" class="hidden md:flex items-center gap-2 text-xs bg-slate-800/50 px-3 py-2 rounded-lg">
+                        <i class="fa-solid fa-cloud text-slate-400"></i>
+                        <span class="text-slate-400">Bağlanıyor...</span>
+                    </div>
+                    
+                    <div class="hidden md:flex flex-col items-end w-56">
+                        <div class="flex justify-between w-full text-xs mb-2">
+                            <span class="text-slate-300 font-semibold">Genel İlerleme</span>
+                            <span id="progressText" class="text-green-400 font-mono font-bold text-sm">0%</span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-800/80 rounded-full overflow-hidden border border-slate-700/50">
+                            <div id="totalProgress" class="progress-bar h-full w-0 transition-all duration-700 ease-out"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- Sınav Bilgisi - Kompakt -->
+        <div class="mb-8 slide-in">
+            <div class="info-card border-purple-500 p-6 rounded-2xl">
+                <div class="flex items-start justify-between gap-6 flex-wrap">
+                    <!-- TYT -->
+                    <div class="flex-1 min-w-[280px]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="bg-gradient-to-br from-purple-500 to-blue-500 p-2 rounded-lg">
+                                <i class="fa-solid fa-book-open text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg">TYT 2026</h3>
+                                <p class="text-xs text-purple-300">20 Haziran 2026 • 135 dk • 120 soru</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 text-xs flex-wrap">
+                            <span class="badge bg-green-900/30 text-green-300 px-2 py-1 rounded border border-green-700/30">Türkçe: 40</span>
+                            <span class="badge bg-blue-900/30 text-blue-300 px-2 py-1 rounded border border-blue-700/30">Mat: 40</span>
+                            <span class="badge bg-purple-900/30 text-purple-300 px-2 py-1 rounded border border-purple-700/30">Fen: 20</span>
+                            <span class="badge bg-orange-900/30 text-orange-300 px-2 py-1 rounded border border-orange-700/30">Sosyal: 20</span>
+                        </div>
+                    </div>
+
+                    <!-- AYT -->
+                    <div class="flex-1 min-w-[280px]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="bg-gradient-to-br from-blue-500 to-cyan-500 p-2 rounded-lg">
+                                <i class="fa-solid fa-brain text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg">AYT 2026</h3>
+                                <p class="text-xs text-blue-300">21 Haziran 2026 • 180 dk • 160 soru</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 text-xs flex-wrap">
+                            <span class="badge bg-blue-900/30 text-blue-300 px-2 py-1 rounded border border-blue-700/30">Mat: 40</span>
+                            <span class="badge bg-purple-900/30 text-purple-300 px-2 py-1 rounded border border-purple-700/30">Fen: 40</span>
+                            <span class="badge bg-pink-900/30 text-pink-300 px-2 py-1 rounded border border-pink-700/30">Edebiyat: 40</span>
+                            <span class="badge bg-orange-900/30 text-orange-300 px-2 py-1 rounded border border-orange-700/30">Sosyal: 40</span>
+                        </div>
+                    </div>
+
+                    <!-- Geri Sayım -->
+                    <div class="flex-1 min-w-[200px] text-center">
+                        <div class="bg-gradient-to-br from-red-900/30 to-orange-900/30 border border-red-600/30 rounded-xl p-4">
+                            <p class="text-xs text-red-300 mb-1 uppercase font-bold">Sınava Kalan</p>
+                            <p class="text-3xl font-bold text-white font-mono" id="countdown">--</p>
+                            <p class="text-xs text-red-300 mt-1">gün</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 90 Günlük Program Bilgisi - Kompakt -->
+        <div class="info-card border-purple-500 p-5 mb-8 rounded-2xl slide-in">
+            <div class="flex items-start gap-4">
+                <div class="bg-gradient-to-br from-purple-500 to-blue-500 p-3 rounded-xl flex-shrink-0">
+                    <i class="fa-solid fa-calendar-days text-white text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-white font-bold text-xl mb-2">🎯 90 Günlük Stratejik Program</h3>
+                    <p class="text-purple-100 text-sm mb-4 leading-relaxed">
+                        Önce TYT temelini sağlam at, sonra AYT'ye geç. 3 evrede başarıya ulaş!
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="phase-badge rounded-lg p-3">
+                            <div class="text-green-400 font-bold mb-1 flex items-center gap-1.5">
+                                <span>🟢</span> Gün 1-35: TYT Temel
+                            </div>
+                            <div class="text-green-100 text-xs">%100 TYT odaklı</div>
+                        </div>
+                        <div class="phase-badge rounded-lg p-3">
+                            <div class="text-purple-400 font-bold mb-1 flex items-center gap-1.5">
+                                <span>🟣</span> Gün 36-63: AYT Geçiş
+                            </div>
+                            <div class="text-purple-100 text-xs">%70 AYT + %30 TYT</div>
+                        </div>
+                        <div class="phase-badge rounded-lg p-3">
+                            <div class="text-red-400 font-bold mb-1 flex items-center gap-1.5">
+                                <span>🔴</span> Gün 64-90: AYT Zirve
+                            </div>
+                            <div class="text-red-100 text-xs">Limit, Türev, İntegral</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-purple-500/30">
+                <p class="text-xs text-yellow-200 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-yellow-400"></i>
+                    <span><strong>Altın Kural:</strong> Her gün 20 paragraf + 15 problem çöz!</span>
+                </p>
+            </div>
+        </div>
+
+        <div id="weekly-container" class="space-y-4"></div>
+
+        <!-- Konu Listesi Bölümü -->
+        <div class="mt-16">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="bg-gradient-to-br from-purple-500 to-blue-500 p-3 rounded-xl">
+                    <i class="fa-solid fa-list-check text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-white glow-text">
+                    KONU LİSTESİ & TAKİP
+                </h2>
+            </div>
+            
+            <div class="info-card border-purple-500 p-5 mb-8 rounded-2xl">
+                <p class="text-purple-100 text-sm leading-relaxed flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-purple-400 text-lg mt-0.5"></i>
+                    <span>
+                        <strong class="text-purple-300">📋 Müfredat Takip:</strong> Bitirdiğin konuların yanındaki kutucuğa tik atarak ilerlemeni görebilirsin. Her konu önem derecesi ve soru sayısı ile işaretlenmiştir.
+                    </span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" id="subjects-container">
+                <!-- JS ile dolacak -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDk5DLUAWeaN2LoOE2CmtY5-TIa-svTY04",
+            authDomain: "tyt-2026-planlayici.firebaseapp.com",
+            databaseURL: "https://tyt-2026-planlayici-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "tyt-2026-planlayici",
+            storageBucket: "tyt-2026-planlayici.firebasestorage.app",
+            messagingSenderId: "716195471041",
+            appId: "1:716195471041:web:732c2c60c320ca37a0fe40",
+            measurementId: "G-Z34XD5PF0X"
+        };
+
+        // Firebase'i başlat (hata olursa yerel modda çalış)
+        let firebaseApp = null;
+        let database = null;
+        let useCloud = false;
+        const USER_ID = 'tyt_user_2026'; // Sabit kullanıcı ID'si
+
+        try {
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            useCloud = true;
+            console.log('Firebase bağlantısı başarılı');
+        } catch (error) {
+            console.log('Firebase başlatılamadı, yerel modda çalışılıyor:', error);
+        }
+
+        // LocalStorage Key
+        const STORAGE_KEY = 'tyt_2026_progress';
+
+        // Veri Yapısı
+        const studyPlan = {
+            examInfo: {
+                tyt: {
+                    date: "20 Haziran 2026 Cuma",
+                    duration: 135,
+                    totalQuestions: 120,
+                    subjects: {
+                        turkce: 40,
+                        matematik: 40,
+                        fen: 20,
+                        sosyal: 20
+                    }
+                },
+                ayt: {
+                    date: "21 Haziran 2026 Cumartesi",
+                    duration: 180,
+                    totalQuestions: 160
+                }
+            },
+            weeks: [
+                {
+                    title: "1. HAFTA: Temel Kavramlar",
+                    phase: "🟢 TYT Temel Atma",
+                    date: "Gün 1-7",
+                    importance: 0.85,
+                    days: [
+                        { day: "1. Gün", task: "Mat: Temel Kavramlar, Sayı Basamakları | Türkçe: Sözcükte Anlam | Fizik: Fizik Bilimine Giriş", check: "d1" },
+                        { day: "2. Gün", task: "Mat: Bölme-Bölünebilme, EBOB-EKOK | Türkçe: Cümlede Anlam | Kimya: Kimya Bilimine Giriş", check: "d2" },
+                        { day: "3. Gün", task: "Mat: Rasyonel Sayılar | Türkçe: Paragraf Ana Düşünce (20 soru) | Biyoloji: Canlıların Ortak Özellikleri", check: "d3" },
+                        { day: "4. Gün", task: "Geo: Doğruda ve Üçgende Açı | Tarih: İlk Uygarlıklar | Coğrafya: Doğa ve İnsan", check: "d4" },
+                        { day: "5. Gün", task: "Mat: Problem Çözme Temelleri | Türkçe: Paragraf Yardımcı Düşünce (20 soru) | Fizik: Madde ve Özellikleri", check: "d5" },
+                        { day: "6. Gün", task: "Mat: Oran-Orantı Giriş | Kimya: Maddenin Sınıflandırılması | Felsefe: Felsefeye Giriş", check: "d6" },
+                        { day: "7. Gün", task: "🎯 TEKRAR: Haftalık Eksik Konular + 1 TYT Denemesi", check: "d7" }
+                    ]
+                },
+                {
+                    title: "2. HAFTA: Üslü-Köklü ve Paragraf",
+                    phase: "🟢 TYT Temel Atma",
+                    date: "Gün 8-14",
+                    importance: 0.90,
+                    days: [
+                        { day: "8. Gün", task: "Mat: Üslü Sayılar | Türkçe: Paragraf Yapı (20 soru) | Biyoloji: Hücre ve Organeller", check: "d8" },
+                        { day: "9. Gün", task: "Mat: Köklü Sayılar | Türkçe: Paragraf Anlatım Teknikleri (20 soru) | Kimya: Atom ve Yapısı", check: "d9" },
+                        { day: "10. Gün", task: "Mat: Mutlak Değer | Geo: Özel Üçgenler | Tarih: İlk Türk Devletleri", check: "d10" },
+                        { day: "11. Gün", task: "Mat: Çarpanlara Ayırma | Türkçe: Düşünceyi Geliştirme (20 soru) | Fizik: Hareket ve Kuvvet", check: "d11" },
+                        { day: "12. Gün", task: "Kimya: Periyodik Sistem | Biyoloji: Hücre Zarından Madde Geçişi | Coğrafya: Harita Bilgisi", check: "d12" },
+                        { day: "13. Gün", task: "Mat: Denklemler | Türkçe: Paragraf Boşluk Doldurma (20 soru) | Din: Hz. Muhammed", check: "d13" },
+                        { day: "14. Gün", task: "🎯 TEKRAR: Haftalık Eksik Konular + 1 TYT Denemesi", check: "d14" }
+                    ]
+                },
+                {
+                    title: "3-4. HAFTA: PROBLEMLER (Altın Dönem)",
+                    phase: "🟢 TYT Temel Atma",
+                    date: "Gün 15-25",
+                    importance: 0.98,
+                    days: [
+                        { day: "15. Gün", task: "🔥 Mat: Sayı Problemleri (30 soru) | Türkçe: Paragraf (20 soru) | Fizik: Kuvvet Çeşitleri", check: "d15" },
+                        { day: "16. Gün", task: "🔥 Mat: Kesir Problemleri (25 soru) | Türkçe: Yazım Kuralları | Kimya: Kimyasal Bağlar", check: "d16" },
+                        { day: "17. Gün", task: "🔥 Mat: Yaş Problemleri (25 soru) | Geo: Üçgende Alan | Tarih: Selçuklular", check: "d17" },
+                        { day: "18. Gün", task: "🔥 Mat: Yüzde-Faiz Problemleri (30 soru) | Türkçe: Noktalama | Biyoloji: Mitoz", check: "d18" },
+                        { day: "19. Gün", task: "🔥 Mat: Kar-Zarar Problemleri (25 soru) | Coğrafya: İklim | Felsefe: Bilgi Felsefesi", check: "d19" },
+                        { day: "20. Gün", task: "🔥 Mat: Karışım Problemleri (20 soru) | Türkçe: Fiiller | Fizik: İş-Güç-Enerji", check: "d20" },
+                        { day: "21. Gün", task: "🎯 DENEME: TYT Genel Denemesi + Detaylı Analiz", check: "d21" },
+                        { day: "22. Gün", task: "🔥 Mat: Hareket Problemleri (25 soru) | Türkçe: Anlatım Bozuklukları | Kimya: Mol Kavramı", check: "d22" },
+                        { day: "23. Gün", task: "🔥 Mat: İşçi Problemleri (20 soru) | Geo: Benzerlik | Tarih: Osmanlı Kuruluş", check: "d23" },
+                        { day: "24. Gün", task: "Mat: Tablo-Grafik Problemleri | Biyoloji: Mayoz | Coğrafya: Nüfus ve Yerleşme", check: "d24" },
+                        { day: "25. Gün", task: "🎯 TEKRAR: Problem Türleri Hızlı Tekrar + Mini Deneme", check: "d25" }
+                    ]
+                },
+                {
+                    title: "5. HAFTA: TYT Son Konular",
+                    phase: "🟢 TYT Temel Atma",
+                    date: "Gün 26-35",
+                    importance: 0.88,
+                    days: [
+                        { day: "26. Gün", task: "Mat: Kümeler | Türkçe: Cümlenin Öğeleri | Fizik: Basınç", check: "d26" },
+                        { day: "27. Gün", task: "Mat: Mantık | Geo: Çokgenler | Kimya: Asit-Baz", check: "d27" },
+                        { day: "28. Gün", task: "🔥 Mat: Fonksiyonlar (AYT Kapısı) | Türkçe: Paragraf (20 soru) | Biyoloji: Kalıtım", check: "d28" },
+                        { day: "29. Gün", task: "🔥 Geo: Dörtgenler | Tarih: Kurtuluş Savaşı | Coğrafya: İç-Dış Kuvvetler", check: "d29" },
+                        { day: "30. Gün", task: "Mat: Olasılık | Fizik: Elektrik Temelleri | Felsefe: Ahlak Felsefesi", check: "d30" },
+                        { day: "31. Gün", task: "Mat: Permütasyon-Kombinasyon | Kimya: Çözeltiler | Din: İslam İnanç Esasları", check: "d31" },
+                        { day: "32. Gün", task: "🔥 Geo: Çember ve Daire | Biyoloji: Ekosistem | Türkçe: Paragraf (20 soru)", check: "d32" },
+                        { day: "33. Gün", task: "🎯 DENEME: TYT Genel Denemesi + Analiz", check: "d33" },
+                        { day: "34. Gün", task: "Mat: Veri Analizi | Tarih: Cumhuriyet Dönemi | Coğrafya: Ekonomik Faaliyetler", check: "d34" },
+                        { day: "35. Gün", task: "🎯 TYT GENEL TEKRAR: Zayıf Konular + Problem-Paragraf Maratonu", check: "d35" }
+                    ]
+                },
+                {
+                    title: "6-9. HAFTA: AYT Geçiş Dönemi",
+                    phase: "🟣 AYT Geçiş",
+                    date: "Gün 36-63",
+                    importance: 0.93,
+                    days: [
+                        { day: "36-42. Gün", task: "AYT Mat: Polinomlar, 2.Derece Denklemler, Karmaşık Sayılar, Analitik Geo | AYT Fizik: Modern Atom | AYT Kimya: Gazlar | TYT: Günlük 15 Problem + 15 Paragraf", check: "d36" },
+                        { day: "43-49. Gün", task: "🔥 AYT Mat: Trigonometri-1, Trigonometri-2, Logaritma, Diziler | AYT Fizik: Newton Yasaları | AYT Kimya: Sıvı Çözeltiler | TYT: Haftada 2 Genel Deneme", check: "d43" },
+                        { day: "50-56. Gün", task: "AYT Mat: Fonksiyon Uygulamaları, Eşitsizlikler | AYT Geo: Katı Cisimler | AYT Fizik: Atışlar | AYT Kimya: Kimyasal Denge | TYT: Sosyal Check-up", check: "d50" },
+                        { day: "57-63. Gün", task: "AYT Fizik: Enerji, Momentum | AYT Kimya: Elektrokimya | AYT Biyoloji: Dolaşım, Bağışıklık | TYT: Fen Check-up + Son TYT Denemesi", check: "d57" }
+                    ]
+                },
+                {
+                    title: "10-11. HAFTA: LİMİT-TÜREV (Zirve)",
+                    phase: "🔴 AYT Zirve",
+                    date: "Gün 64-77",
+                    importance: 1.00,
+                    days: [
+                        { day: "64-66. Gün", task: "🔥🔥 AYT Mat: Limit Kavramı, Limit Hesaplama, Süreklilik (Her gün 4 saat) | AYT Fizik: Elektrik Alan | AYT Kimya: Organik-1", check: "d64" },
+                        { day: "67. Gün", task: "🎯 AYT DENEME: Matematik Branş Denemesi", check: "d67" },
+                        { day: "68-71. Gün", task: "🔥🔥 AYT Mat: Türev Tanımı, Türev Kuralları, Türev Uygulamaları, Maks-Min (Her gün 4 saat) | AYT Fizik: Manyetizma | AYT Kimya: Organik-2", check: "d68" },
+                        { day: "72. Gün", task: "🎯 AYT DENEME: Genel AYT Denemesi", check: "d72" },
+                        { day: "73-77. Gün", task: "🔥 AYT Mat: Türev İleri, Olasılık İleri | AYT Geo: Çemberin Analitiği | AYT Fizik: Elektromanyetik İndüksiyon | AYT Biyoloji: DNA-Protein Sentezi | AYT: Gün aşırı Deneme", check: "d73" }
+                    ]
+                },
+                {
+                    title: "12-13. HAFTA: İNTEGRAL ve Final",
+                    phase: "🔴 AYT Zirve + Final",
+                    date: "Gün 78-90",
+                    importance: 0.95,
+                    days: [
+                        { day: "78-80. Gün", task: "🔥🔥 AYT Mat: Belirsiz İntegral, Belirli İntegral, İntegral ile Alan (Her gün 4 saat) | AYT Fizik: Modern Fizik | AYT Kimya: Asit-Baz Dengesi", check: "d78" },
+                        { day: "81. Gün", task: "🎯 PROVA: Sabah TYT - Öğle AYT Tam Sınav Simülasyonu", check: "d81" },
+                        { day: "82-84. Gün", task: "AYT Mat: İntegral ile Hacim | AYT: Organik Kimya Hızlı Tur | AYT Fizik: Dalgalar-Optik | GENEL DENEME", check: "d82" },
+                        { day: "85-88. Gün", task: "Eksik Konular: Mantık, Karmaşık Sayılar | Düşük Önem: Radyoaktivite, Biyoteknoloji | MEB Çıkmış Sorular (Son 3 Yıl)", check: "d85" },
+                        { day: "89. Gün", task: "🎯 SON PROVA: Sabah TYT - Öğle AYT Tam Sınav", check: "d89" },
+                        { day: "90. Gün", task: "💆 DİNLENME: Hafif Tekrar, Motivasyon, Strateji Gözden Geçirme", check: "d90" }
+                    ]
+                }
+            ],
+            subjects: {
+                turkce: {
+                    title: "TÜRKÇE (40 Soru)",
+                    icon: "fa-book",
+                    color: "green",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Paragrafta Ana Düşünce / Konu", importance: 1.00, questions: "3-5" },
+                        { name: "Paragrafta Yardımcı Düşünce", importance: 0.95, questions: "2-3" },
+                        { name: "Paragrafta Yapı (Giriş-Gelişme-Sonuç)", importance: 0.92, questions: "2-3" },
+                        { name: "Paragrafta Anlatım Teknikleri", importance: 0.95, questions: "2-4" },
+                        { name: "Paragrafta Düşünceyi Geliştirme Yolları", importance: 0.95, questions: "2-3" },
+                        { name: "Paragrafta Boşluk Doldurma", importance: 0.90, questions: "2-3" },
+                        { name: "Paragrafta Cümle/Paragraf Sıralaması", importance: 0.90, questions: "2-3" },
+                        { name: "Cümlede Anlam (İfade Çeşitleri)", importance: 0.97, questions: "4-6" },
+                        { name: "Sözcükte Anlam (Gerçek-Yan-Mecaz-Terim)", importance: 0.95, questions: "3-5" },
+                        { name: "Sözcükler Arası Anlam İlişkileri", importance: 0.93, questions: "2-3" },
+                        { name: "Deyim ve Atasözleri", importance: 0.85, questions: "1-2" },
+                        { name: "Cümlenin Anlam Özellikleri", importance: 0.80, questions: "1-2" },
+                        { name: "Ses Bilgisi (Ses Olayları)", importance: 0.75, questions: "1-2" },
+                        { name: "Yazım Kuralları", importance: 0.78, questions: "1-2" },
+                        { name: "Noktalama İşaretleri", importance: 0.72, questions: "1-2" },
+                        { name: "Sözcük Türleri - İsimler", importance: 0.65, questions: "0-1" },
+                        { name: "Sözcük Türleri - Sıfatlar", importance: 0.60, questions: "0-1" },
+                        { name: "Sözcük Türleri - Zamirler", importance: 0.60, questions: "0-1" },
+                        { name: "Sözcük Türleri - Zarflar", importance: 0.55, questions: "0-1" },
+                        { name: "Sözcük Türleri - Edatlar/Bağlaçlar", importance: 0.55, questions: "0-1" },
+                        { name: "Sözcük Türleri - Fiiller (Çatı, Kip)", importance: 0.72, questions: "1-2" },
+                        { name: "Sözcük Yapısı (Kök, Gövde, Ekler)", importance: 0.65, questions: "0-1" },
+                        { name: "Cümlenin Öğeleri", importance: 0.78, questions: "1-2" },
+                        { name: "Cümle Türleri", importance: 0.65, questions: "0-1" },
+                        { name: "Anlatım Bozuklukları", importance: 0.90, questions: "2-3" },
+                        { name: "Fiilimsi (Sıfat/Zarf/İsim Fiil)", importance: 0.63, questions: "0-1" }
+                    ]
+                },
+                matematik: {
+                    title: "MATEMATİK (40 Soru)",
+                    icon: "fa-calculator",
+                    color: "blue",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Sayılar ve Sayı Basamakları", importance: 0.90, questions: "2-3" },
+                        { name: "Doğal Sayılar, Tam Sayılar", importance: 0.80, questions: "1-2" },
+                        { name: "EBOB – EKOK", importance: 0.78, questions: "1-2" },
+                        { name: "Rasyonel Sayılar (Kesirler)", importance: 0.82, questions: "1-2" },
+                        { name: "Ondalık Sayılar", importance: 0.55, questions: "0-1" },
+                        { name: "Üslü Sayılar", importance: 0.88, questions: "1-2" },
+                        { name: "Köklü Sayılar", importance: 0.88, questions: "1-2" },
+                        { name: "Oran – Orantı", importance: 0.83, questions: "1-2" },
+                        { name: "Denklemler (1. Dereceden)", importance: 0.85, questions: "1-2" },
+                        { name: "Eşitsizlikler", importance: 0.78, questions: "1-2" },
+                        { name: "Mutlak Değer", importance: 0.75, questions: "1-2" },
+                        { name: "Sayı Problemleri", importance: 0.95, questions: "2-3" },
+                        { name: "Kesir Problemleri", importance: 0.80, questions: "1-2" },
+                        { name: "Yaş Problemleri", importance: 0.90, questions: "1-2" },
+                        { name: "Yüzde – Faiz Problemleri", importance: 0.92, questions: "1-2" },
+                        { name: "Kar-Zarar Problemleri", importance: 0.90, questions: "1-2" },
+                        { name: "Karışım Problemleri", importance: 0.82, questions: "1-2" },
+                        { name: "Hareket Problemleri", importance: 0.90, questions: "1-2" },
+                        { name: "İşçi (Havuz) Problemleri", importance: 0.80, questions: "1-2" },
+                        { name: "Tablo ve Grafik Problemleri", importance: 0.75, questions: "1" },
+                        { name: "Rutin Olmayan Problemler", importance: 0.65, questions: "0-1" },
+                        { name: "Kümeler", importance: 0.82, questions: "1-2" },
+                        { name: "Mantık (Önermeler)", importance: 0.78, questions: "1-2" },
+                        { name: "Fonksiyonlar", importance: 0.83, questions: "1-2" },
+                        { name: "2. Dereceden Denklemler", importance: 0.75, questions: "1" },
+                        { name: "Permütasyon", importance: 0.80, questions: "1-2" },
+                        { name: "Kombinasyon", importance: 0.80, questions: "1-2" },
+                        { name: "Olasılık", importance: 0.88, questions: "1-2" },
+                        { name: "Veri Analizi (Ortalama, Mod, Medyan)", importance: 0.82, questions: "1-2" },
+                        { name: "Polinomlar", importance: 0.60, questions: "0-1" },
+                        { name: "Temel Geometri Kavramları", importance: 0.90, questions: "1-2" },
+                        { name: "Doğrular ve Açılar", importance: 0.92, questions: "1-2" },
+                        { name: "Üçgenler (Koşullar, Çeşitler)", importance: 0.97, questions: "2-4" },
+                        { name: "Özel Üçgenler (Dik, Eşkenar, İkizkenar)", importance: 0.93, questions: "1-2" },
+                        { name: "Üçgende Alan", importance: 0.90, questions: "1-2" },
+                        { name: "Üçgende Benzerlik", importance: 0.82, questions: "1-2" },
+                        { name: "Üçgende Açıortay ve Kenarortay", importance: 0.80, questions: "1" },
+                        { name: "Çokgenler", importance: 0.78, questions: "1-2" },
+                        { name: "Dörtgenler (Kare, Dikdörtgen, Yamuk)", importance: 0.92, questions: "2-3" },
+                        { name: "Çember ve Daire", importance: 0.95, questions: "2-3" },
+                        { name: "Koordinat Geometrisi (Temel)", importance: 0.60, questions: "0-1" },
+                        { name: "Dönüşüm Geometrisi", importance: 0.58, questions: "0-1" },
+                        { name: "Katı Cisimler (Hacim/Alan)", importance: 0.55, questions: "0-1" }
+                    ]
+                },
+                fizik: {
+                    title: "FİZİK (7 Soru)",
+                    icon: "fa-atom",
+                    color: "purple",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Fizik Bilimine Giriş (Ölçme, Birim)", importance: 0.80, questions: "1" },
+                        { name: "Madde ve Özellikleri", importance: 0.80, questions: "1" },
+                        { name: "Hareket ve Kuvvet (Newton Kanunları)", importance: 0.95, questions: "2-3" },
+                        { name: "Sürtünme Kuvveti", importance: 0.78, questions: "1" },
+                        { name: "İş, Güç, Enerji", importance: 0.95, questions: "1-2" },
+                        { name: "Atışlar (Yatay, Eğik)", importance: 0.82, questions: "1" },
+                        { name: "Basınç (Katı, Sıvı, Hava)", importance: 0.90, questions: "1" },
+                        { name: "Kaldırma Kuvveti", importance: 0.80, questions: "1" },
+                        { name: "Elektrostatik (Yük, Coulomb)", importance: 0.78, questions: "1" },
+                        { name: "Elektrik Devreleri (Temel)", importance: 0.82, questions: "1" },
+                        { name: "Dalgalar – Ses", importance: 0.78, questions: "1" },
+                        { name: "Optik (Ayna, Mercek Temel)", importance: 0.65, questions: "0-1" },
+                        { name: "Isı ve Sıcaklık", importance: 0.78, questions: "1" },
+                        { name: "Basit Makineler", importance: 0.60, questions: "0-1" },
+                        { name: "Astronominin Temelleri", importance: 0.45, questions: "0-1" }
+                    ]
+                },
+                kimya: {
+                    title: "KİMYA (7 Soru)",
+                    icon: "fa-flask",
+                    color: "orange",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Kimya Bilimine Giriş", importance: 0.65, questions: "0-1" },
+                        { name: "Maddenin Sınıflandırılması", importance: 0.80, questions: "1" },
+                        { name: "Atom ve Yapısı", importance: 0.93, questions: "1-2" },
+                        { name: "Periyodik Tablo", importance: 0.92, questions: "1-2" },
+                        { name: "Kimyasal Bağlar (İyonik, Kovalent)", importance: 0.90, questions: "1-2" },
+                        { name: "Kimyasal Tepkimeler", importance: 0.90, questions: "1" },
+                        { name: "Mol Kavramı ve Hesaplamaları", importance: 0.82, questions: "1" },
+                        { name: "Asit-Baz (Temel)", importance: 0.80, questions: "1" },
+                        { name: "Çözeltiler (Derişim, Çözünürlük)", importance: 0.78, questions: "1" },
+                        { name: "Karışımlar ve Ayrılması", importance: 0.75, questions: "1" },
+                        { name: "Organik Kimya Temelleri", importance: 0.60, questions: "0-1" },
+                        { name: "Günlük Hayatta Kimya", importance: 0.55, questions: "0-1" },
+                        { name: "Radyoaktivite Temelleri", importance: 0.40, questions: "0-1" }
+                    ]
+                },
+                biyoloji: {
+                    title: "BİYOLOJİ (6 Soru)",
+                    icon: "fa-dna",
+                    color: "teal",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Canlıların Ortak Özellikleri", importance: 0.80, questions: "1" },
+                        { name: "Hücre (Yapısı, Organeller)", importance: 0.95, questions: "1-2" },
+                        { name: "Hücre Zarından Madde Geçişi", importance: 0.90, questions: "1" },
+                        { name: "Canlıların Sınıflandırılması", importance: 0.78, questions: "1" },
+                        { name: "Canlılar Arası Etkileşim", importance: 0.65, questions: "0-1" },
+                        { name: "Ekosistem ve Biyoçeşitlilik", importance: 0.65, questions: "0-1" },
+                        { name: "Biyokütle ve Enerji Akışı", importance: 0.55, questions: "0-1" },
+                        { name: "Biyolojik Döngüler (Karbon, Azot)", importance: 0.55, questions: "0-1" },
+                        { name: "Mitoz Bölünme", importance: 0.92, questions: "1" },
+                        { name: "Mayoz Bölünme", importance: 0.82, questions: "1" },
+                        { name: "Kalıtım Temelleri (Mendel)", importance: 0.78, questions: "1" },
+                        { name: "DNA ve RNA Yapısı", importance: 0.80, questions: "1" },
+                        { name: "Üreme (Eşeyli, Eşeysiz)", importance: 0.62, questions: "0-1" },
+                        { name: "Sinir Sistemi Temelleri", importance: 0.55, questions: "0-1" },
+                        { name: "Destek ve Hareket Sistemi", importance: 0.45, questions: "0-1" }
+                    ]
+                },
+                tarih: {
+                    title: "TARİH (5 Soru)",
+                    icon: "fa-landmark",
+                    color: "red",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Tarih Bilimine Giriş", importance: 0.55, questions: "0-1" },
+                        { name: "İlk Uygarlıklar (Mezopotamya, Mısır)", importance: 0.60, questions: "0-1" },
+                        { name: "İlk Türk Devletleri (Hunlar, Göktürkler)", importance: 0.75, questions: "1" },
+                        { name: "İslamiyet'in Doğuşu ve Yayılması", importance: 0.72, questions: "1" },
+                        { name: "Türklerin İslamiyeti Kabulü", importance: 0.65, questions: "0-1" },
+                        { name: "Selçuklular (Büyük Selçuklu, Anadolu)", importance: 0.75, questions: "1" },
+                        { name: "Osmanlı Devleti'nin Kuruluşu", importance: 0.78, questions: "1" },
+                        { name: "Osmanlı Yükselme Dönemi", importance: 0.80, questions: "1" },
+                        { name: "Osmanlı'da Toplum ve Ekonomi", importance: 0.72, questions: "1" },
+                        { name: "Osmanlı'nın Duraklama ve Çöküşü", importance: 0.65, questions: "0-1" },
+                        { name: "19. YY Osmanlı ve Dünya", importance: 0.80, questions: "1" },
+                        { name: "20. YY Başları ve 1. Dünya Savaşı", importance: 0.80, questions: "1" },
+                        { name: "Kurtuluş Savaşı", importance: 0.90, questions: "1-2" },
+                        { name: "Cumhuriyet Dönemi Siyasi Gelişmeler", importance: 0.75, questions: "1" },
+                        { name: "2. Dünya Savaşı ve Soğuk Savaş", importance: 0.55, questions: "0-1" },
+                        { name: "Değişen Gündelik Hayat (19-20. YY)", importance: 0.55, questions: "0-1" }
+                    ]
+                },
+                cografya: {
+                    title: "COĞRAFYA (5 Soru)",
+                    icon: "fa-globe",
+                    color: "cyan",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Doğa ve İnsan İlişkisi", importance: 0.55, questions: "0-1" },
+                        { name: "Dünya'nın Şekli ve Hareketleri", importance: 0.50, questions: "0-1" },
+                        { name: "Coğrafi Konum", importance: 0.45, questions: "0-1" },
+                        { name: "Harita Bilgisi", importance: 0.75, questions: "1" },
+                        { name: "Atmosfer ve Sıcaklık", importance: 0.55, questions: "0-1" },
+                        { name: "İklim Bilgisi", importance: 0.93, questions: "1-2" },
+                        { name: "İç ve Dış Kuvvetler", importance: 0.80, questions: "1" },
+                        { name: "Nüfus ve Yerleşme", importance: 0.92, questions: "1-2" },
+                        { name: "Türkiye'nin Yer Şekilleri", importance: 0.55, questions: "0-1" },
+                        { name: "Ekonomik Faaliyetler (Tarım, Madencilik)", importance: 0.75, questions: "1" },
+                        { name: "Türkiye'de Nüfus ve Göç", importance: 0.72, questions: "1" },
+                        { name: "Bölgeler Coğrafyası", importance: 0.55, questions: "0-1" },
+                        { name: "Çevre ve Doğal Afetler", importance: 0.50, questions: "0-1" }
+                    ]
+                },
+                felsefe: {
+                    title: "FELSEFE (5 Soru)",
+                    icon: "fa-brain",
+                    color: "indigo",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Felsefeye Giriş / Felsefenin Tanımı", importance: 0.92, questions: "1-2" },
+                        { name: "Bilgi Felsefesi (Epistemoloji)", importance: 0.90, questions: "1-2" },
+                        { name: "Varlık Felsefesi (Ontoloji)", importance: 0.78, questions: "1" },
+                        { name: "Ahlak Felsefesi (Etik)", importance: 0.80, questions: "1" },
+                        { name: "Siyaset Felsefesi", importance: 0.75, questions: "1" },
+                        { name: "Sanat Felsefesi (Estetik)", importance: 0.62, questions: "0-1" },
+                        { name: "Din Felsefesi", importance: 0.60, questions: "0-1" },
+                        { name: "Bilim Felsefesi", importance: 0.65, questions: "0-1" },
+                        { name: "Büyük Filozoflar (Sokrates, Platon, Kant)", importance: 0.78, questions: "1" }
+                    ]
+                },
+                din: {
+                    title: "DİN KÜLTÜRÜ (5 Soru)",
+                    icon: "fa-mosque",
+                    color: "emerald",
+                    exam: "TYT",
+                    topics: [
+                        { name: "Hz. Muhammed'in Hayatı ve Kişiliği", importance: 0.95, questions: "1-2" },
+                        { name: "Bir Genç Olarak Hz. Muhammed", importance: 0.80, questions: "1" },
+                        { name: "Kuran-ı Kerim'in Temel Özellikleri", importance: 0.82, questions: "1" },
+                        { name: "İslam'ın İnanç Esasları (İman)", importance: 0.90, questions: "1-2" },
+                        { name: "İbadet (Namaz, Oruç, Zekat, Hac)", importance: 0.90, questions: "1-2" },
+                        { name: "Ahlak ve Değerler", importance: 0.78, questions: "1" },
+                        { name: "İslam'da Barış ve Hoşgörü", importance: 0.65, questions: "0-1" },
+                        { name: "Diğer Dinler (Hristiyanlık, Yahudilik)", importance: 0.55, questions: "0-1" },
+                        { name: "Laiklik ve Din", importance: 0.55, questions: "0-1" },
+                        { name: "Gençlik ve Sorunları (Dini Perspektif)", importance: 0.60, questions: "0-1" }
+                    ]
+                }
+            }
+        };
+
+        // LocalStorage İşlemleri
+        function loadProgress() {
+            if (useCloud) {
+                // Buluttan yükle
+                return {}; // Firebase listener'dan gelecek
+            } else {
+                // Yerel depodan yükle
+                const saved = localStorage.getItem(STORAGE_KEY);
+                return saved ? JSON.parse(saved) : {};
+            }
+        }
+
+        function saveProgress(data) {
+            if (useCloud) {
+                // Buluta kaydet
+                updateSyncStatus('syncing');
+                database.ref('users/' + USER_ID + '/progress').set(data)
+                    .then(() => {
+                        updateSyncStatus('synced');
+                    })
+                    .catch((error) => {
+                        console.error('Buluta kayıt hatası:', error);
+                        updateSyncStatus('error');
+                        // Hata olursa yerel depoya kaydet
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                    });
+            } else {
+                // Yerel depoya kaydet
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }
+            updateTotalProgress();
+        }
+
+        function updateSyncStatus(status) {
+            const syncStatus = document.getElementById('syncStatus');
+            const icon = syncStatus.querySelector('i');
+            const text = syncStatus.querySelector('span');
+            
+            if (status === 'synced') {
+                icon.className = 'fa-solid fa-cloud-arrow-up text-green-400';
+                text.textContent = 'Senkronize';
+                text.className = 'text-green-400';
+            } else if (status === 'syncing') {
+                icon.className = 'fa-solid fa-cloud-arrow-up text-blue-400 animate-pulse';
+                text.textContent = 'Kaydediliyor...';
+                text.className = 'text-blue-400';
+            } else if (status === 'error') {
+                icon.className = 'fa-solid fa-cloud-exclamation text-red-400';
+                text.textContent = 'Hata';
+                text.className = 'text-red-400';
+            } else {
+                icon.className = 'fa-solid fa-cloud text-slate-400';
+                text.textContent = 'Yerel';
+                text.className = 'text-slate-400';
+            }
+        }
+
+        // Firebase Senkronizasyon
+        function setupFirebase() {
+            if (!useCloud) {
+                updateSyncStatus('local');
+                return;
+            }
+
+            // Buluttan veriyi yükle ve dinle
+            database.ref('users/' + USER_ID + '/progress').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    // Buluttan gelen veriyi uygula
+                    Object.keys(data).forEach(key => {
+                        const checkbox = document.getElementById(key);
+                        if (checkbox) {
+                            checkbox.checked = data[key];
+                        }
+                    });
+                    updateTotalProgress();
+                    updateSyncStatus('synced');
+                }
+            }, (error) => {
+                console.error('Firebase okuma hatası:', error);
+                updateSyncStatus('error');
+            });
+        }
+
+        function toggleCheck(id) {
+            const progress = loadProgress();
+            progress[id] = !progress[id];
+            saveProgress(progress);
+        }
+
+        function updateTotalProgress() {
+            const progress = loadProgress();
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            const totalTasks = allCheckboxes.length;
+            const completedTasks = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            document.getElementById('progressText').textContent = percentage + '%';
+            document.getElementById('totalProgress').style.width = percentage + '%';
+        }
+
+        // Haftalık Planı Render Et
+        function renderWeeks() {
+            const container = document.getElementById('weekly-container');
+            const progress = loadProgress();
+
+            studyPlan.weeks.forEach((week, weekIndex) => {
+                const weekDiv = document.createElement('details');
+                weekDiv.open = weekIndex === 0;
+
+                // Önem oranına göre border rengi
+                let borderColor = 'border-slate-600/50';
+                let glowColor = '';
+                if (week.importance >= 0.95) {
+                    borderColor = 'border-red-500/60';
+                    glowColor = 'shadow-red-500/20';
+                } else if (week.importance >= 0.90) {
+                    borderColor = 'border-orange-500/60';
+                    glowColor = 'shadow-orange-500/20';
+                } else if (week.importance >= 0.85) {
+                    borderColor = 'border-yellow-500/60';
+                    glowColor = 'shadow-yellow-500/20';
+                }
+                
+                weekDiv.className = `week-card rounded-2xl border-2 ${borderColor} overflow-hidden fade-in shadow-xl ${glowColor}`;
+
+                const summary = document.createElement('summary');
+                summary.className = 'cursor-pointer p-6 hover:bg-slate-800/50 transition-all';
+                
+                // Önem rozeti
+                let importanceBadge = '';
+                if (week.importance >= 0.95) {
+                    importanceBadge = '<span class="badge bg-red-900/40 text-red-300 text-xs px-3 py-1.5 rounded-full border border-red-600/40 font-bold">🔥 KRİTİK</span>';
+                } else if (week.importance >= 0.90) {
+                    importanceBadge = '<span class="badge bg-orange-900/40 text-orange-300 text-xs px-3 py-1.5 rounded-full border border-orange-600/40 font-bold">⚡ Çok Önemli</span>';
+                } else if (week.importance >= 0.85) {
+                    importanceBadge = '<span class="badge bg-yellow-900/40 text-yellow-300 text-xs px-3 py-1.5 rounded-full border border-yellow-600/40 font-bold">⭐ Önemli</span>';
+                } else {
+                    importanceBadge = '<span class="badge bg-slate-700/40 text-slate-300 text-xs px-3 py-1.5 rounded-full border border-slate-600/40">📝 Normal</span>';
+                }
+
+                summary.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="text-xl font-bold text-white">${week.title}</h3>
+                                ${importanceBadge}
+                            </div>
+                            <div class="flex items-center gap-3 text-sm flex-wrap">
+                                <span class="badge bg-slate-800/50 text-slate-300 px-3 py-1 rounded-lg border border-slate-700/50">
+                                    <i class="fa-regular fa-calendar mr-1"></i>${week.date}
+                                </span>
+                                <span class="badge bg-gradient-to-r from-blue-900/40 to-purple-900/40 text-blue-300 px-3 py-1 rounded-lg border border-blue-600/40">
+                                    ${week.phase}
+                                </span>
+                                <span class="badge bg-purple-900/40 text-purple-300 px-3 py-1 rounded-lg border border-purple-600/40 font-mono">
+                                    Önem: ${(week.importance * 100).toFixed(0)}%
+                                </span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-slate-400 text-xl mt-2 chevron"></i>
+                    </div>
+                `;
+
+                const content = document.createElement('div');
+                content.className = 'p-6 pt-0 space-y-3';
+
+                week.days.forEach(day => {
+                    const isChecked = progress[day.check] || false;
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'day-card flex items-start gap-4 p-5 rounded-xl border border-slate-700/50';
+                    
+                    // Konuları ayır ve YouTube butonları oluştur
+                    const topics = day.task.split('|').map(t => t.trim());
+                    const youtubeButtons = topics.map(topic => {
+                        const subtopics = topic.split(':');
+                        if (subtopics.length > 1) {
+                            const subject = subtopics[0].trim();
+                            const items = subtopics[1].split(',').map(item => item.trim());
+                            return items.map(item => {
+                                const searchQuery = encodeURIComponent(`${subject} ${item} konu anlatımı`);
+                                return `<a href="https://www.youtube.com/results?search_query=${searchQuery}" target="_blank" 
+                                          class="youtube-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium">
+                                          <i class="fa-brands fa-youtube"></i> ${subject}: ${item}
+                                        </a>`;
+                            }).join(' ');
+                        }
+                        return '';
+                    }).filter(btn => btn).join(' ');
+
+                    dayDiv.innerHTML = `
+                        <input type="checkbox" id="${day.check}" ${isChecked ? 'checked' : ''} 
+                               class="mt-1.5 w-5 h-5 rounded-lg border-2 border-slate-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer flex-shrink-0">
+                        <div class="flex-1">
+                            <div class="font-bold text-blue-400 mb-2 text-base">${day.day}</div>
+                            <div class="text-sm text-slate-200 mb-3 leading-relaxed">${day.task}</div>
+                            ${youtubeButtons ? `<div class="flex flex-wrap gap-2 mt-3">${youtubeButtons}</div>` : ''}
+                        </div>
+                    `;
+
+                    dayDiv.querySelector('input').addEventListener('change', () => {
+                        toggleCheck(day.check);
+                    });
+
+                    content.appendChild(dayDiv);
+                });
+
+                weekDiv.appendChild(summary);
+                weekDiv.appendChild(content);
+                container.appendChild(weekDiv);
+            });
+        }
+
+        // Konu Listesini Render Et
+        function renderSubjects() {
+            const container = document.getElementById('subjects-container');
+            const progress = loadProgress();
+
+            Object.entries(studyPlan.subjects).forEach(([key, subject]) => {
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'subject-card rounded-2xl border border-slate-700/50 p-6 fade-in shadow-xl';
+                
+                const header = document.createElement('h3');
+                header.className = `text-lg font-bold text-${subject.color}-400 mb-3 flex items-center gap-2`;
+                header.innerHTML = `<i class="fa-solid ${subject.icon} text-xl"></i> ${subject.title}`;
+                
+                const examBadge = document.createElement('div');
+                examBadge.className = `text-xs mb-4 pb-3 border-b border-slate-700/50`;
+                examBadge.innerHTML = `<span class="badge bg-${subject.color}-900/30 text-${subject.color}-300 px-3 py-1.5 rounded-lg border border-${subject.color}-700/40 font-semibold">${subject.exam}</span>`;
+                
+                const topicList = document.createElement('ul');
+                topicList.className = 'space-y-2.5 text-sm max-h-96 overflow-y-auto pr-2';
+
+                subject.topics.forEach((topic, index) => {
+                    const topicId = `${key}_${index}`;
+                    const isChecked = progress[topicId] || false;
+                    
+                    // Önem derecesine göre renk
+                    let importanceColor = 'slate';
+                    let importanceText = 'Düşük';
+                    let importanceIcon = '⚪';
+                    if (topic.importance >= 0.90) {
+                        importanceColor = 'red';
+                        importanceText = 'KRİTİK';
+                        importanceIcon = '🔥';
+                    } else if (topic.importance >= 0.70) {
+                        importanceColor = 'yellow';
+                        importanceText = 'Orta';
+                        importanceIcon = '⭐';
+                    } else {
+                        importanceColor = 'slate';
+                        importanceText = 'Düşük';
+                        importanceIcon = '📝';
+                    }
+                    
+                    const li = document.createElement('li');
+                    li.className = 'topic-item flex items-start gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-all group';
+                    li.innerHTML = `
+                        <input type="checkbox" id="${topicId}" ${isChecked ? 'checked' : ''} 
+                               class="mt-1 w-4 h-4 rounded border-2 border-slate-600 text-${subject.color}-600 focus:ring-2 focus:ring-${subject.color}-500 cursor-pointer flex-shrink-0">
+                        <div class="flex-1 cursor-pointer">
+                            <div class="flex items-start justify-between gap-2 mb-1.5">
+                                <span class="text-slate-200 group-hover:text-white transition-colors leading-snug">${topic.name}</span>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="badge text-xs px-2 py-0.5 rounded-md bg-${importanceColor}-900/30 text-${importanceColor}-400 border border-${importanceColor}-700/30 font-medium">
+                                    ${importanceIcon} ${importanceText}
+                                </span>
+                                <span class="text-xs text-slate-500 font-mono">${topic.questions} soru</span>
+                            </div>
+                        </div>
+                    `;
+
+                    li.querySelector('input').addEventListener('change', () => {
+                        toggleCheck(topicId);
+                    });
+
+                    li.querySelector('div').addEventListener('click', () => {
+                        li.querySelector('input').click();
+                    });
+
+                    topicList.appendChild(li);
+                });
+
+                subjectDiv.appendChild(header);
+                subjectDiv.appendChild(examBadge);
+                subjectDiv.appendChild(topicList);
+                container.appendChild(subjectDiv);
+            });
+        }
+
+        // Sayfa Yüklendiğinde
+        document.addEventListener('DOMContentLoaded', () => {
+            setupFirebase();
+            renderWeeks();
+            renderSubjects();
+            updateTotalProgress();
+            startCountdown();
+        });
+
+        // Geri Sayım
+        function startCountdown() {
+            const examDate = new Date('2026-06-20T09:00:00');
+            
+            function updateCountdown() {
+                const now = new Date();
+                const diff = examDate - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                
+                const countdownEl = document.getElementById('countdown');
+                if (countdownEl) {
+                    if (days > 0) {
+                        countdownEl.textContent = days;
+                    } else {
+                        countdownEl.textContent = '0';
+                    }
+                }
+            }
+            
+            updateCountdown();
+            setInterval(updateCountdown, 1000 * 60 * 60); // Her saat güncelle
+        }
+    </script>
+
+</body>
+</html>
