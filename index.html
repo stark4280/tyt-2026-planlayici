@@ -1157,6 +1157,8 @@
 
         // İstatistik Paneli Güncelleme
         function updateStatsPanel(totalPercentage) {
+            console.log('updateStatsPanel called with:', totalPercentage);
+            
             // Toplam ilerleme
             document.getElementById('statTotalProgress').textContent = totalPercentage + '%';
             document.getElementById('statTotalBar').style.width = totalPercentage + '%';
@@ -1164,12 +1166,14 @@
             // TYT konuları
             const tytSubjects = ['turkce', 'matematik', 'fizik', 'kimya', 'biyoloji', 'tarih', 'cografya', 'felsefe', 'din'];
             const tytStats = calculateSubjectGroupProgress(tytSubjects);
+            console.log('TYT Stats:', tytStats);
             document.getElementById('statTYTProgress').textContent = tytStats.percentage + '%';
             document.getElementById('statTYTCount').textContent = `${tytStats.completed}/${tytStats.total}`;
             
             // AYT konuları
             const aytSubjects = ['aytMatematik', 'aytGeometri', 'aytFizik', 'aytKimya', 'aytBiyoloji'];
             const aytStats = calculateSubjectGroupProgress(aytSubjects);
+            console.log('AYT Stats:', aytStats);
             document.getElementById('statAYTProgress').textContent = aytStats.percentage + '%';
             document.getElementById('statAYTCount').textContent = `${aytStats.completed}/${aytStats.total}`;
             
@@ -1181,6 +1185,7 @@
                     completedDays++;
                 }
             }
+            console.log('Completed Days:', completedDays);
             document.getElementById('statCompletedDays').textContent = completedDays;
         }
 
@@ -1202,6 +1207,8 @@
                     });
                 }
             });
+            
+            console.log(`calculateSubjectGroupProgress: ${subjectKeys[0]} - completed: ${completed}, total: ${total}`);
             
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             return { completed, total, percentage };
