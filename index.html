@@ -1173,10 +1173,13 @@
             document.getElementById('statAYTProgress').textContent = aytStats.percentage + '%';
             document.getElementById('statAYTCount').textContent = `${aytStats.completed}/${aytStats.total}`;
             
-            // Tamamlanan günler
+            // Tamamlanan günler - checkbox'ları kontrol et
             let completedDays = 0;
             for (let i = 1; i <= 90; i++) {
-                if (progressCache[`d${i}`]) completedDays++;
+                const checkbox = document.getElementById(`d${i}`);
+                if (checkbox && checkbox.checked) {
+                    completedDays++;
+                }
             }
             document.getElementById('statCompletedDays').textContent = completedDays;
         }
@@ -1191,7 +1194,11 @@
                     subject.topics.forEach((topic, index) => {
                         const topicId = `${key}_${index}`;
                         total++;
-                        if (progressCache[topicId]) completed++;
+                        // Checkbox'ı kontrol et
+                        const checkbox = document.getElementById(topicId);
+                        if (checkbox && checkbox.checked) {
+                            completed++;
+                        }
                     });
                 }
             });
